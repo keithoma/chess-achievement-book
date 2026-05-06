@@ -110,6 +110,8 @@ class AchievementEngine:
 
         self.check_mastery(metrics)
 
+        self.check_feats(metrics)
+
     def check_participation(self, m: GameMetrics):
         self._grant(m.game_id, 'played-game', "Played a game")
         self._grant(m.game_id, f'played-{m.speed}', f"Played a {m.speed} game")
@@ -182,3 +184,14 @@ class AchievementEngine:
             self._grant(m.game_id, 'punished-blunder-1', f"Punished an opponent's blunder (at {m.blunders_punished_moves[0]})")
         if len(m.blunders_punished_moves) >= 2: 
             self._grant(m.game_id, 'punished-blunder-2', f"Executioner: Punished multiple blunders in one game (2nd at {m.blunders_punished_moves[1]})")
+
+    def check_feats(self, m: GameMetrics):
+        """Evaluates rare, difficult, or highly specific feats."""
+        # 3. The Botez Gambit
+        if m.is_win and m.blundered_queen:
+            self._grant(m.game_id, 'feat-botez-gambit', "Botez Gambit: Blundered your Queen and still won the game")
+            
+        # 4. The Iron Mind (120+ Moves)
+        # Note: We don't require a win here. Just surviving 120 moves is a feat.
+        if m.total_plies >= 240: 
+            self._grant(m.game_id, 'feat-120-moves', "Iron Mind: Survive a grueling game of over 120 moves")

@@ -47,6 +47,8 @@ class GameMetrics:
         self.clean_pawns_won_moves = []
         
         self.total_material_points = 0
+        self.final_eval = 0
+        self.blundered_queen = False
 
         # Lazy loaded properties
         self._draw_reason = None

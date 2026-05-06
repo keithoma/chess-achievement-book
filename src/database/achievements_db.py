@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 def setup_achievements_db():
     query = """
-    -- Existing Badges Table
+    -- Tracks every time an achievement happens in a specific game (The Ledger)
     CREATE TABLE IF NOT EXISTS game_achievements (
         game_id TEXT,
         username TEXT,
@@ -13,6 +13,16 @@ def setup_achievements_db():
         granted_at TIMESTAMPTZ DEFAULT NOW(),
         PRIMARY KEY (game_id, achievement_slug)
     );
+
+    -- NEW/RESTORED: The Global Trophy Cabinet (One row per badge per user)
+    CREATE TABLE IF NOT EXISTS user_badges (
+        username TEXT,
+        achievement_slug TEXT,
+        first_achieved_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (username, achievement_slug)
+    );
+
+    -- (Keep your mastery_progress and game_mastery_grants tables here too)
 
     -- NEW: Overall Mastery Progress Tracking
     CREATE TABLE IF NOT EXISTS mastery_progress (
