@@ -2,17 +2,12 @@ import json
 import requests
 import chess
 import logging
-import argparse
 from datetime import datetime, timezone
-
-# Assuming this is your local module
-from database.connection import get_connection 
+from src.database.connection import get_connection 
 
 # Define the boundary as a timezone-aware datetime object
-# 2026-05-01 00:00:00 UTC
 MAY_FIRST_2026 = datetime(2026, 5, 1, tzinfo=timezone.utc)
 
-# Initialize the logger (configuration happens in __main__)
 logger = logging.getLogger(__name__)
 
 def extract_game_events(moves_string):
@@ -90,7 +85,6 @@ def save_game_to_db(game_data: dict):
                     game_data['score'],
                     json.dumps(game_data)
                 ))
-                # Check if a row was actually inserted or if it was a conflict
                 inserted = cur.rowcount > 0
             conn.commit()
             
@@ -187,13 +181,10 @@ def fetch_and_store_games(username: str, limit: int = 50):
     headers = {'Accept': 'application/x-ndjson'}
 
     logger.info(f"📡 Filtering games for {username} (Since May 1st, Limit: {limit})...")
-    logger.debug(f"API Request URL: {url}")
-    logger.debug(f"API Request Params: {params}")
     
     with requests.get(url, params=params, headers=headers, stream=True) as response:
         if response.status_code != 200:
             logger.error(f"❌ API Error: HTTP {response.status_code}")
-            logger.error(f"Response Body: {response.text}")
             return
 
         count = 0
@@ -205,58 +196,22 @@ def fetch_and_store_games(username: str, limit: int = 50):
             
             raw_game = json.loads(line)
             game_id = raw_game.get('id')
-            speed = raw_game.get('speed', 'unknown')
-            moves_string = raw_game.get('moves', '')
-            num_moves = len(moves_string.split())
             
-            logger.debug(f"--- Processing Line {total_lines_read} | Game ID: {game_id} | Speed: {speed} ---")
-
-            # 1. Date Check
             createdAt_ms = raw_game.get('createdAt')
             if not createdAt_ms:
-                logger.debug(f"  [!] Skipped {game_id}: Missing 'createdAt' timestamp.")
                 continue
 
             game_time = datetime.fromtimestamp(createdAt_ms / 1000, tz=timezone.utc)
-            logger.debug(f"  -> Date: {game_time.strftime('%Y-%m-%d %H:%M:%S')} UTC")
 
             if game_time < MAY_FIRST_2026:
                 logger.info(f"📅 Reached {game_time.strftime('%Y-%m-%d')}. Stopping fetch.")
                 break
             
-            # 2. Variants Check (Initial FEN usually implies Chess960 or custom start)
-            if 'initialFen' in raw_game:
-                logger.debug(f"  [!] Skipped {game_id}: Custom Initial FEN (Likely variant).")
-                continue
-                
-            # 3. Game Length Check
-            if num_moves < 4:
-                logger.debug(f"  [!] Skipped {game_id}: Game too short ({num_moves} plies).")
+            if 'initialFen' in raw_game or len(raw_game.get('moves', '').split()) < 4:
                 continue
             
-            # Formatting and Saving
             clean_game = format_game_data(raw_game)
             save_game_to_db(clean_game)
             count += 1
 
-        logger.info(f"🏁 Finished! Read {total_lines_read} lines, ingested {count} games.")
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Ingest Lichess games into the database.")
-    parser.add_argument("--debug", action="store_true", help="Enable highly verbose debug logging")
-    parser.add_argument("--limit", type=int, default=50, help="Max number of games to request from Lichess")
-    parser.add_argument("--user", type=str, default="noctu2nality", help="Lichess username to target")
-    args = parser.parse_args()
-
-    # Configure the logger based on the --debug flag
-    log_level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%H:%M:%S"
-    )
-
-    if args.debug:
-        logger.debug("🪲 DEBUG MODE ACTIVATED")
-
-    fetch_and_store_games(args.user, limit=args.limit)
+        logger.info(f"🏁 Finished fetching. Ingested {count} games into local DB.")

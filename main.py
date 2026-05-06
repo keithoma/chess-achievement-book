@@ -1,6 +1,48 @@
-def main():
-    print("Hello from chess-achievement-book!")
+import logging
+import argparse
 
+# Import your two modules
+from src.database.ingest_games import fetch_and_store_games
+from src.achievements.scanner import process_achievements
+
+logger = logging.getLogger(__name__)
+
+def main():
+    parser = argparse.ArgumentParser(description="Chess Achievement Tracker")
+    parser.add_argument("-l", "--limit", type=int, default=1, 
+                        help="Number of recent games to pull from Lichess (Default: 1)")
+    parser.add_argument("-u", "--user", type=str, default="noctu2nality", 
+                        help="Lichess username to target")
+    parser.add_argument("--skip-fetch", action="store_true", 
+                        help="Skip pulling from Lichess and only scan the local database")
+    parser.add_argument("--debug", action="store_true", 
+                        help="Enable highly verbose debug logging")
+    
+    args = parser.parse_args()
+
+    # Configure global logging
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%H:%M:%S"
+    )
+
+    print(f"♟️  Starting Chess Tracker for '{args.user}'")
+    
+    # Step 1: Ingestion
+    if not args.skip_fetch:
+        print(f"📥 Fetching the last {args.limit} game(s)...")
+        # Note: Ensure your fetch_and_store_games function accepts the limit parameter
+        fetch_and_store_games(username=args.user, limit=args.limit)
+    else:
+        print("⏭️  Skipping Lichess API fetch...")
+
+    # Step 2: Achievement Scanning
+    print("🏆 Scanning local database for new achievements...")
+    process_achievements(username=args.user)
+    
+    print("✅ All done!")
 
 if __name__ == "__main__":
     main()
