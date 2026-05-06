@@ -27,6 +27,72 @@ class AchievementEngine:
         else:
             logger.debug(f"  - Skipped: '{slug}' already granted for game {game_id}")
 
+    def _grant_mastery(self, game_id, category, slug, name, exp_to_add):
+        """Grants EXP and updates the player's total mastery progress safely."""
+        # 1. Ledger Check: Did we already grant this EXP for this game?
+        check_query = "SELECT 1 FROM game_mastery_grants WHERE game_id = %s AND mastery_slug = %s AND username = %s"
+        self.cur.execute(check_query, (game_id, slug, self.username))
+        if self.cur.fetchone():
+            return # Quietly skip, already processed
+
+        # 2. Record the grant in the ledger
+        insert_grant = """
+            INSERT INTO game_mastery_grants (game_id, username, mastery_slug, exp_granted)
+            VALUES (%s, %s, %s, %s)
+        """
+        self.cur.execute(insert_grant, (game_id, self.username, slug, exp_to_add))
+
+        # 3. Upsert the total mastery progress
+        upsert_progress = """
+            INSERT INTO mastery_progress (username, category, slug, name, total_exp)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (username, category, slug) 
+            DO UPDATE SET total_exp = mastery_progress.total_exp + EXCLUDED.total_exp
+            RETURNING total_exp;
+        """
+        self.cur.execute(upsert_progress, (self.username, category, slug, name, exp_to_add))
+        new_total = self.cur.fetchone()[0]
+
+        # Log it dynamically!
+        if self.show_all:
+            logger.info(f"📈 QUALIFIED [{self.username}]: {name} +{exp_to_add} EXP (Total: {new_total:.1f}) (Game: {game_id})")
+        else:
+            logger.info(f"📈 MASTERY UP [{self.username}]: {name} +{exp_to_add} EXP (Total: {new_total:.1f}) (Game: {game_id})")
+
+    def check_mastery(self, m: GameMetrics):
+        """Calculates experience points for opening mastery."""
+        # Clean the opening name to get the base (e.g., "Caro-Kann Defense: Advance" -> "Caro-Kann Defense")
+        base_opening = m.opening_name.split(':')[0].split('|')[0].strip()
+        if base_opening == 'Unknown' or not base_opening:
+            return
+
+        # Create a clean URL-friendly slug (e.g., "caro-kann-defense")
+        import re
+        slug = re.sub(r'[^a-z0-9]+', '-', base_opening.lower()).strip('-')
+
+        # Calculate how many plies actually occurred in the opening
+        opening_plies = m.mid_start if m.mid_start else m.total_plies
+        
+        # Calculate how many of those plies YOU played
+        my_opening_moves = 0
+        for i in range(opening_plies):
+            is_my_turn = (m.is_white and i % 2 == 0) or (not m.is_white and i % 2 == 1)
+            if is_my_turn:
+                my_opening_moves += 1
+
+        # Determine multiplier based on game outcome
+        if m.is_win:
+            multiplier = 5.0
+        elif m.is_draw:
+            multiplier = 4.0
+        else:
+            multiplier = 2.5
+
+        exp_earned = my_opening_moves * multiplier
+
+        if exp_earned > 0:
+            self._grant_mastery(m.game_id, 'opening', slug, base_opening, exp_earned)
+
     def evaluate(self, metrics: GameMetrics):
         """Main entry point to run a game through all achievement rulesets."""
         self.check_participation(metrics)
@@ -41,6 +107,8 @@ class AchievementEngine:
             
         self.check_material(metrics)
         self.check_punishments(metrics)
+
+        self.check_mastery(metrics)
 
     def check_participation(self, m: GameMetrics):
         self._grant(m.game_id, 'played-game', "Played a game")

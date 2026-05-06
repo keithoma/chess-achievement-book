@@ -13,6 +13,10 @@ class GameMetrics:
         self.total_plies = len(self.san_moves)
         self.termination = game_data.get('termination', 'unknown').lower()
         
+        # NEW: Capture Opening Info
+        self.opening_name = game_data.get('opening', {}).get('name', 'Unknown')
+        self.opening_eco = game_data.get('opening', {}).get('eco', 'Unknown')
+        
         # Player Context
         self.white_id = game_data['players']['white'].get('id', '').lower()
         self.is_white = (self.white_id == username)
@@ -50,6 +54,13 @@ class GameMetrics:
         # Execute crunching algorithms
         self._analyze_evals(game_data.get('move_evals', []))
         self._analyze_material(game_data.get('captures', []), game_data.get('move_evals', []))
+
+        # (Inside GameMetrics __init__)
+        self.termination = game_data.get('termination', 'unknown').lower()
+        
+        # NEW: Capture Opening Info
+        self.opening_name = game_data.get('opening', {}).get('name', 'Unknown')
+        self.opening_eco = game_data.get('opening', {}).get('eco', 'Unknown')
 
     def _format_move(self, ply_index):
         """Converts a 0-based ply index into readable notation (e.g. '17. Qxc5' or '17... Qxc5')"""
