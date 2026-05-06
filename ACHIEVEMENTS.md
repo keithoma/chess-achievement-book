@@ -39,10 +39,9 @@
 - win a game with always being above 0.0 as white, or above -0.3 as black
 - win a game without any blunders
 - win a game without any mistakes and blunders
-- win a game without any mistakes, blunders, nor inaccuracy
 
 - win a game that is longer than 80 moves
-- win a game that is longer than 120 moves (feat)
+
 
 ### In Game
 
@@ -53,5 +52,8 @@
 ## FEATS
 - four connect
 - reach lone King vs lone King
+- win a game that is longer than 120 moves (feat)
+
+- win a game without any mistakes, blunders, nor inaccuracy
 
 ### Checkmates
