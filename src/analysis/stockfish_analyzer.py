@@ -94,7 +94,8 @@ def analyze_game_data(input_pgn: str, book_path: str, low_depth: int = 8, high_d
         real_delta = w_chances_high[0] - w_after
 
         # Logic: Low depth hated it (drop >= 20%), high depth loved it (drop < 5%)
-        if low_delta >= 0.20 and real_delta < 0.05:
+        # if low_delta >= 0.20 and real_delta < 0.05:
+        if low_delta >= 0.10 and real_delta < 0.05:
             next_node.nags.add(3) # !!
 
         # C) Only Move (□) - NAG 7
