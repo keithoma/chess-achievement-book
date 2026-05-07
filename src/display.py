@@ -87,24 +87,26 @@ def show_profile(username: str):
     print(f"\n{'='*50}\n")
 
 
-def show_history(username: str, limit: int = 5):
+def show_history(username: str, limit: int = 10):
     """Displays the ledger of what was earned in recent games."""
-    print(f"\n{'='*60}")
+    print(f"\n{'='*90}")
     print(f"📜 RECENT GAME HISTORY: {username.upper()}")
-    print(f"{'='*60}")
+    print(f"{'='*90}")
 
-    # FIX: Group by game_id and grab the max timestamp to avoid duplicate blocks
+    # JOIN with the 'games' table so we can extract the JSONB data for names and openings
     games_query = """
-        SELECT game_id, MAX(granted_at) as recent_grant
-        FROM game_grants_ledger
-        WHERE username = %s
-        GROUP BY game_id
+        SELECT ggl.game_id, MAX(ggl.granted_at) as recent_grant, g.game_data
+        FROM game_grants_ledger ggl
+        JOIN games g ON ggl.game_id = g.id
+        WHERE ggl.username = %s
+        GROUP BY ggl.game_id, g.game_data
         ORDER BY recent_grant DESC
         LIMIT %s;
     """
 
+    # Fetch ad.description so we can show how the badge is earned
     ledger_query = """
-        SELECT ad.name, ad.type, ggl.change_amount, ggl.tier_unlocked
+        SELECT ad.name, ad.description, ad.type, ggl.change_amount, ggl.tier_unlocked
         FROM game_grants_ledger ggl
         JOIN achievement_definitions ad ON ggl.def_id = ad.id
         WHERE ggl.game_id = %s AND ggl.username = %s;
@@ -119,20 +121,41 @@ def show_history(username: str, limit: int = 5):
                 print("\n 🦗 No history found. Run the scanner first!")
                 return
 
-            for game_id, recent_grant in recent_games:
+            for game_id, recent_grant, game_data_raw in recent_games:
+                # Ensure game_data is a dictionary
+                game_data = game_data_raw if isinstance(game_data_raw, dict) else json.loads(game_data_raw)
+                
+                # 1. Extract Player Names
+                white_player = game_data.get("players", {}).get("white", {})
+                black_player = game_data.get("players", {}).get("black", {})
+                
+                # Dig into the Lichess nesting we saw in your JSON dump
+                white = white_player.get("user", {}).get("name", white_player.get("id", "Unknown"))
+                black = black_player.get("user", {}).get("name", black_player.get("id", "Unknown"))
+                
+                # 2. Extract Opening Name
+                opening_obj = game_data.get("opening", {})
+                opening = opening_obj.get("name", "Unknown Opening") if isinstance(opening_obj, dict) else "Unknown Opening"
+                
                 date_str = _format_date(recent_grant)
-                print(f"\n⚔️  GAME ID: {game_id} | Scanned on: {date_str}")
-                print("-" * 60)
+                
+                # 3. Print Header
+                print(f"\n⚔️  {white} vs {black}")
+                print(f"   Opening: {opening}")
+                print(f"   [ID: {game_id} | Scanned: {date_str}]")
+                print("-" * 90)
                 
                 cur.execute(ledger_query, (game_id, username))
                 grants = cur.fetchall()
                 
-                for name, ach_type, amount, tier in grants:
+                for name, desc, ach_type, amount, tier in grants:
                     if ach_type == 'feat' or ach_type == 'story':
-                        print(f"   🎉 UNLOCKED: {name}")
+                        print(f"   🎉 UNLOCKED: {name:<20} ({desc})")
                     elif ach_type == 'mastery':
-                        print(f"   📈 {name:<25} | +{amount} EXP")
+                        print(f"   📈 {name:<20} | +{amount} EXP  ({desc})")
                     elif ach_type == 'badge':
-                        print(f"   📊 {name:<25} | +{amount} Progress")
+                        print(f"   📊 {name:<20} | +{amount} Prog | ({desc})")
+                        if tier:
+                            print(f"      🏅 BADGE UPGRADED! Reached {tier.upper()} tier!")
                         
-    print(f"\n{'='*60}\n")
+    print(f"\n{'='*90}\n")
