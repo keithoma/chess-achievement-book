@@ -19,7 +19,9 @@ License: MIT
 import logging
 import argparse
 import sys
+
 from src.orchestrator import run_pipeline
+from src.display import show_profile, show_history
 
 def main():
     """
@@ -45,8 +47,21 @@ def main():
                         help="Enable highly verbose debug logging")
     parser.add_argument("--export-pgn", action="store_true",
                         help="Export annotated PGNs to /debug/pgn_files/")
-
+    parser.add_argument("--profile", action="store_true", 
+                        help="Display the user's unlocked trophies and mastery")
+    parser.add_argument("--history", action="store_true", 
+                        help="Display the recent game ledger (what was earned per game)")
+    
     args = parser.parse_args()
+    
+    # Check if we are just displaying UI, otherwise run the pipeline
+    if args.profile:
+        show_profile(args.user)
+        sys.exit(0)
+        
+    if args.history:
+        show_history(args.user, limit=5)
+        sys.exit(0)
 
     log_level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(

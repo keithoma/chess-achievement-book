@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from src.config import BOOK_PATH
 from src.database.connection import get_connection
-from src.analysis.stockfish_analyzer import analyze_game_data
+from src.analysis.stockfish_analyzer import AchievementAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ def analyze_pending_games(limit=None):
         
         # NOTE: low_depth=1, high_depth=22 is currently hardcoded here. 
         # Lower high_depth if it takes too long to test!
-        annotated_pgn, local_evals = analyze_game_data(
+        annotated_pgn, local_evals = AchievementAnalyzer(
             pgn_string, 
             book_path=BOOK_PATH,
             low_depth=1, 
