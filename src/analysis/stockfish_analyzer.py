@@ -57,18 +57,26 @@ def analyze_game_data(input_pgn: str, book_path: str, low_depth: int = 1, high_d
         w_after = get_win_chances(post_score if not board.turn else -post_score)
 
         # --- 3. THE SYMBOL LOGIC ---
-        # A) Novelty (N) - NAG 146
+        # --- A) Novelty (N) Logic ---
         if reader and not novelty_found:
-            # Check if the position was in the book, but the move isn't
-            # Note: We check the board BEFORE the move was pushed
             prev_board = board.copy()
             prev_board.pop()
-            book_entries = [e.move for e in reader.find_all(prev_board)]
             
-            if not book_entries: # The position itself wasn't in the book
-                next_node.nags.add(146)
-                novelty_found = True
-            elif move_played not in book_entries: # Position in book, but move is new
+            # Get EVERY move the book knows, even low-weight ones
+            all_entries = list(reader.find_all(prev_board))
+            book_moves = [e.move for e in all_entries]
+
+            # DEBUG PRINT: Uncomment this to see what moves the book actually sees
+            # if len(board.move_stack) < 10:
+            #    print(f"Ply {len(board.move_stack)}: Book knows {len(book_moves)} moves. Player played {move_played}")
+
+            if not book_moves:
+                # If even move 1 (e.g., 1. e4) isn't in the book, 
+                # something is wrong with the file path or the reader.
+                if len(board.move_stack) > 2: # Only flag novelty after move 1
+                    next_node.nags.add(146)
+                    novelty_found = True
+            elif move_played not in book_moves:
                 next_node.nags.add(146)
                 novelty_found = True
 

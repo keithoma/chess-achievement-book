@@ -2,5 +2,6 @@
 __pycache__/
 .venv/
 *.jsonl
-Solista-ENG 2026E-BIN/
+
+opening_books/
 debug/pgn_files/

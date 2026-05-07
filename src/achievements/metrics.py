@@ -2,9 +2,7 @@ import chess
 import chess.polyglot
 import os
 
-# Adjust this path if your working directory changes.
-# Based on your explorer image, this is the path from the project root.
-BOOK_PATH = "Solista-ENG 2026E-BIN/Solista-ENG 2026E.bin"
+from src.config import BOOK_PATH
 
 class GameMetrics:
     """

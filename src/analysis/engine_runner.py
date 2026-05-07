@@ -1,9 +1,9 @@
 import json
 import logging
+
+from src.config import BOOK_PATH
 from src.database.connection import get_connection
 from src.analysis.stockfish_analyzer import analyze_game_data
-
-BOOK_PATH = "Solista-ENG 2026E-BIN/Solista-ENG 2026E.bin"
 
 logger = logging.getLogger(__name__)
 
