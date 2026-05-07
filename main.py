@@ -4,13 +4,14 @@ import argparse
 from src.database.ingest_games import fetch_and_store_games
 from src.achievements.scanner import process_achievements
 from src.analysis.engine_runner import analyze_pending_games
+from src.database.achievements_db import setup_achievements_db
 
 logger = logging.getLogger(__name__)
 
 def main():
     parser = argparse.ArgumentParser(description="Chess Achievement Tracker")
-    parser.add_argument("-l", "--limit", type=int, default=1, 
-                        help="Number of recent games to pull from Lichess (Default: 1)")
+    parser.add_argument("-l", "--limit", type=int, default=50, 
+                        help="Number of recent games to pull from Lichess (Default: 50)")
     parser.add_argument("-u", "--user", type=str, default="noctu2nality", 
                         help="Lichess username to target")
     parser.add_argument("--skip-fetch", action="store_true", 
@@ -55,14 +56,15 @@ def main():
         print("⏭️  Skipping heavy Stockfish analysis...")
 
     # Step 2: Achievement Scanning
-    print("🏆 Scanning local database for achievements...")
+    print("🏆 Preparing database and scanning for achievements...")
     
-    # Determine how many games the scanner should look at
-    scan_limit = None if args.scan_all else args.limit
+    # 1. Run your setup first!
+    setup_achievements_db() 
     
+    # 2. Run the scanner
     process_achievements(
         username=args.user, 
-        limit=scan_limit, 
+        limit=args.limit, 
         show_all=args.show_achievements,
         export_pgn=args.export_pgn
     )

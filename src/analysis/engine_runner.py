@@ -3,6 +3,8 @@ import logging
 from src.database.connection import get_connection
 from src.analysis.stockfish_analyzer import analyze_game_data
 
+BOOK_PATH = "Solista-ENG 2026E-BIN/Solista-ENG 2026E.bin"
+
 logger = logging.getLogger(__name__)
 
 def build_pgn_from_json(game_data):
@@ -61,7 +63,12 @@ def analyze_pending_games(limit=None):
         
         # NOTE: low_depth=1, high_depth=22 is currently hardcoded here. 
         # Lower high_depth if it takes too long to test!
-        annotated_pgn, local_evals = analyze_game_data(pgn_string, low_depth=1, high_depth=14)
+        annotated_pgn, local_evals = analyze_game_data(
+            pgn_string, 
+            book_path=BOOK_PATH,
+            low_depth=1, 
+            high_depth=14
+        )
 
         if annotated_pgn:
             # 3. Update the game_data dictionary
