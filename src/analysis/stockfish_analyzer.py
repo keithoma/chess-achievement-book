@@ -9,7 +9,7 @@ STOCKFISH_PATH = "/usr/games/stockfish"
 def get_win_chances(cp):
     return 0.5 + 0.5 * (2 / (1 + math.exp(-0.003682 * cp)) - 1)
 
-def analyze_game_data(input_pgn: str, book_path: str, low_depth: int = 1, high_depth: int = 22):
+def analyze_game_data(input_pgn: str, book_path: str, low_depth: int = 1, high_depth: int = 14):
     pgn_file = io.StringIO(input_pgn.strip())
     game = chess.pgn.read_game(pgn_file)
     if not game: return None, []
@@ -83,9 +83,6 @@ def analyze_game_data(input_pgn: str, book_path: str, low_depth: int = 1, high_d
         # B) Brilliancy (!!) - NAG 3
         # Use low-depth blindspot logic
         low_res = engine.analyse(board.copy(), chess.engine.Limit(depth=low_depth)) # Board is post-move
-        # (This logic compares depth 1 vs depth 22 as you had before)
-        # ... logic as previously implemented ...
-        # (Simplified here for space, keep your specific blindspot deltas)
         
         # C) Only Move (□) - NAG 7
         # Logic: Top move is >= 20% win chance better than 2nd
