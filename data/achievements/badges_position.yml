@@ -1,0 +1,23 @@
+---
+- id: badge_material_total
+  type: badge
+  category: Material
+  name: The Hoarder
+  description: Total points of materials captured (including trades).
+  config:
+    tiers:
+      bronze: 500
+      silver: 2500
+      gold: 10000
+      platinum: 50000
+- id: badge_clean_pawns
+  type: badge
+  category: Material
+  name: Pawn Snatcher
+  description: Number of clean pawns won (the pawn winning move is not a mistake nor a blunder and the pawn is kept for 5 or more turns).
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---

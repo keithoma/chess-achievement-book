@@ -1,0 +1,223 @@
+---
+###############################################################################
+# SECTION 1: GAMES PLAYED
+###############################################################################
+- id: badge_played_total
+  type: badge
+  category: Volume
+  name: Chess Enthusiast
+  description: Total games played across all time controls.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+      platinum: 1000
+- id: badge_played_ultrabullet
+  type: badge
+  category: Volume
+  name: Speed Demon
+  description: Total Ultra Bullet games played.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_played_bullet
+  type: badge
+  category: Volume
+  name: Bullet Sprinter
+  description: Total Bullet games played.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_played_blitz
+  type: badge
+  category: Volume
+  name: Blitz Regular
+  description: Total Blitz games played.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_played_rapid
+  type: badge
+  category: Volume
+  name: Rapid Thinker
+  description: Total Rapid games played.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_played_classical
+  type: badge
+  category: Volume
+  name: Classical Scholar
+  description: Total Classical games played.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 2: GAMES WON
+###############################################################################
+- id: badge_won_total
+  type: badge
+  category: Combat
+  name: Gladiator
+  description: Total games won across all time controls.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_won_ultrabullet
+  type: badge
+  category: Combat
+  name: Ultra Victor
+  description: Total Ultra Bullet games won.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_won_bullet
+  type: badge
+  category: Combat
+  name: Bullet Sniper
+  description: Total Bullet games won.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_won_blitz
+  type: badge
+  category: Combat
+  name: Blitz Champion
+  description: Total Blitz games won.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_won_rapid
+  type: badge
+  category: Combat
+  name: Rapid Master
+  description: Total Rapid games won.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_won_classical
+  type: badge
+  category: Combat
+  name: Classical Master
+  description: Total Classical games won.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 3: WIN PHASE
+###############################################################################
+- id: badge_win_phase_opening
+  type: badge
+  category: Combat
+  name: Early Knockout
+  description: Win games during the opening phase.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_win_phase_midgame
+  type: badge
+  category: Combat
+  name: Midgame Dominator
+  description: Win games during the middle game phase.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_win_phase_endgame
+  type: badge
+  category: Combat
+  name: Endgame Grinder
+  description: Win games during the end game phase.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 4: WIN METHOD
+###############################################################################
+- id: badge_win_method_checkmate
+  type: badge
+  category: Termination
+  name: The Executioner
+  description: Win a game by delivering checkmate.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_win_method_resignation
+  type: badge
+  category: Termination
+  name: Psychological Warfare
+  description: Win a game by forcing your opponent to resign.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_win_method_timeout
+  type: badge
+  category: Termination
+  name: Clock Management
+  description: Win a game by your opponent running out of time.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_win_method_abandonment
+  type: badge
+  category: Termination
+  name: Rage Quitter's Bane
+  description: Win a game by opponent abandonment.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 4: MOVE LENGTH
+###############################################################################
+- id: badge_marathon
+  type: badge
+  category: Volume
+  name: Iron Lung
+  description: Win a game that is longer than 80 moves.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+

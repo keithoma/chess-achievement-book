@@ -1,0 +1,142 @@
+###############################################################################
+# SECTION 1: DRAW RECOVERY
+###############################################################################
+- id: badge_draw_lost_threefold
+  type: badge
+  category: Resilience
+  name: Deja Vu Defense
+  description: Draw a previously lost position by three fold repetition.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_draw_lost_agreement
+  type: badge
+  category: Resilience
+  name: Silver Tongue
+  description: Draw a previously lost position by agreement.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_draw_lost_50move
+  type: badge
+  category: Resilience
+  name: The Long Hold
+  description: Draw a previously lost position by the 50 move rule.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_draw_lost_insufficient
+  type: badge
+  category: Resilience
+  name: Scorched Earth
+  description: Draw a previously lost position by insufficient material.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 2: COMEBACKS
+###############################################################################
+- id: badge_comeback_1_5_late
+  type: badge
+  category: Comebacks
+  name: Late Bloomer
+  description: Be down 1.5 or more after the opening and the mid game and still win.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_comeback_2_0_fast
+  type: badge
+  category: Comebacks
+  name: Swift Retribution
+  description: Be down 2.0 or more after the opening and win in 20 moves after the opening.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_comeback_3_0_mid
+  type: badge
+  category: Comebacks
+  name: Miracle Worker
+  description: Be down 3.0 or more after the opening and win.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_comeback_endgame_2_0
+  type: badge
+  category: Comebacks
+  name: Never Surrender
+  description: Start the end game with 2.0 down and draw or win.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 3: PRECISION
+###############################################################################
+- id: badge_perfect_eval
+  type: badge
+  category: Precision
+  name: Iron Clad
+  description: Win a game with always being above 0.0 as white, or below +0.5 as black.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_no_blunders
+  type: badge
+  category: Precision
+  name: Solid Play
+  description: Win a game without any blunders.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_no_mistakes_blunders
+  type: badge
+  category: Precision
+  name: Flawless Victory
+  description: Win a game without any mistakes and blunders.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_punish_mistakes
+  type: badge
+  category: Capitalization
+  name: Opportunist
+  description: Punish opponents mistakes.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_punish_blunders
+  type: badge
+  category: Capitalization
+  name: Sharp Justice
+  description: Punish opponents blunders.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
