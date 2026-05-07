@@ -143,4 +143,4 @@ if __name__ == "__main__":
 """
     
     # Run the analysis
-    analyze_to_pgn(my_pgn_string, low_depth=0, high_depth=22)
+    analyze_to_pgn(my_pgn_string, low_depth=1, high_depth=14)

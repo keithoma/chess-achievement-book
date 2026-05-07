@@ -3,6 +3,7 @@ import argparse
 
 from src.database.ingest_games import fetch_and_store_games
 from src.achievements.scanner import process_achievements
+from src.analysis.engine_runner import analyze_pending_games
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +15,8 @@ def main():
                         help="Lichess username to target")
     parser.add_argument("--skip-fetch", action="store_true", 
                         help="Skip pulling from Lichess and only scan the local database")
+    parser.add_argument("--skip-analysis", action="store_true", 
+                        help="Skip the heavy Stockfish Depth 22 analysis step")
     parser.add_argument("--scan-all", action="store_true", 
                         help="Ignore the limit and scan EVERY game in the database")
     parser.add_argument("--show-achievements", action="store_true", 
@@ -39,6 +42,15 @@ def main():
         fetch_and_store_games(username=args.user, limit=args.limit)
     else:
         print("⏭️  Skipping Lichess API fetch...")
+
+    # Step 1.5: Deep Engine Analysis
+    if not args.skip_analysis:
+        print("🧠 Running Stockfish Deep Analysis on pending games...")
+        # You will need to create this function to loop through games in your DB 
+        # that don't have move_evals yet, run stockfish_analyzer.py, and save the results.
+        analyze_pending_games(limit=args.limit)
+    else:
+        print("⏭️  Skipping heavy Stockfish analysis...")
 
     # Step 2: Achievement Scanning
     print("🏆 Scanning local database for achievements...")

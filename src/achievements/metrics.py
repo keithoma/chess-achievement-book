@@ -1,4 +1,10 @@
 import chess
+import chess.polyglot
+import os
+
+# Adjust this path if your working directory changes.
+# Based on your explorer image, this is the path from the project root.
+BOOK_PATH = "Solista-ENG 2026E-BIN/Solista-ENG 2026E.bin"
 
 class GameMetrics:
     """
@@ -13,7 +19,7 @@ class GameMetrics:
         self.total_plies = len(self.san_moves)
         self.termination = game_data.get('termination', 'unknown').lower()
         
-        # NEW: Capture Opening Info
+        # Capture Opening Info
         self.opening_name = game_data.get('opening', {}).get('name', 'Unknown')
         self.opening_eco = game_data.get('opening', {}).get('eco', 'Unknown')
         
@@ -41,7 +47,6 @@ class GameMetrics:
         self.mistakes = 0
         self.blunders = 0
         
-        # CHANGED: We now track the exact moves, not just a count
         self.mistakes_punished_moves = []
         self.blunders_punished_moves = []
         self.clean_pawns_won_moves = []
@@ -50,19 +55,21 @@ class GameMetrics:
         self.final_eval = 0
         self.blundered_queen = False
 
+        # --- NEW: Polyglot Book Metrics ---
+        self.my_book_moves = 0
+        self.total_book_plies = 0
+        self.my_book_weights = []
+        self.out_of_book_ply = None
+
         # Lazy loaded properties
         self._draw_reason = None
 
         # Execute crunching algorithms
         self._analyze_evals(game_data.get('move_evals', []))
         self._analyze_material(game_data.get('captures', []), game_data.get('move_evals', []))
-
-        # (Inside GameMetrics __init__)
-        self.termination = game_data.get('termination', 'unknown').lower()
         
-        # NEW: Capture Opening Info
-        self.opening_name = game_data.get('opening', {}).get('name', 'Unknown')
-        self.opening_eco = game_data.get('opening', {}).get('eco', 'Unknown')
+        # Run the Opening Book analysis
+        self._analyze_opening_book()
 
     def _format_move(self, ply_index):
         """Converts a 0-based ply index into readable notation (e.g. '17. Qxc5' or '17... Qxc5')"""
@@ -74,6 +81,44 @@ class GameMetrics:
             return f"{move_num}. {san}"
         else:
             return f"{move_num}... {san}"
+
+    def _analyze_opening_book(self):
+        """Steps through the game and checks moves against the Solista Polyglot book."""
+        if not os.path.exists(BOOK_PATH):
+            return # Skip if the book isn't downloaded or path is wrong
+
+        board = chess.Board()
+        
+        try:
+            with chess.polyglot.open_reader(BOOK_PATH) as reader:
+                for i, move_str in enumerate(self.san_moves):
+                    try:
+                        # Find the move the player actually made on the board
+                        player_move = board.parse_san(move_str)
+                    except ValueError:
+                        break # Failsafe for invalid SAN
+                    
+                    # Fetch all known book moves for the current position
+                    entries = reader.find_all(board)
+                    book_moves = {e.move: e.weight for e in entries}
+
+                    if player_move in book_moves:
+                        self.total_book_plies += 1
+                        weight = book_moves[player_move]
+                        
+                        is_my_turn = (self.is_white and i % 2 == 0) or (not self.is_white and i % 2 == 1)
+                        if is_my_turn:
+                            self.my_book_moves += 1
+                            self.my_book_weights.append(weight)
+                            
+                        # Advance the board state to check the next move
+                        board.push(player_move)
+                    else:
+                        # The move played is not in Solista. We are out of book.
+                        self.out_of_book_ply = i
+                        break
+        except Exception as e:
+            print(f"Error reading polyglot book: {e}")
 
     def _analyze_evals(self, evals):
         for i in range(len(evals)):

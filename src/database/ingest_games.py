@@ -176,7 +176,7 @@ def fetch_and_store_games(username: str, limit: int = 50):
         'moves': 'true',
         'opening': 'true',
         'clocks': 'true',
-        'evals': 'true' 
+        'evals': 'false' 
     }
     headers = {'Accept': 'application/x-ndjson'}
 

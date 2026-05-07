@@ -74,38 +74,68 @@ class AchievementEngine:
             logger.info(f"📈 MASTERY UP [{self.username}]: {name} +{exp_to_add} EXP (Total: {new_total:.1f}) (Game: {game_id})")
 
     def check_mastery(self, m: GameMetrics):
-        """Calculates experience points for opening mastery."""
+        """Calculates experience points for opening mastery using Solista data."""
         # Clean the opening name to get the base (e.g., "Caro-Kann Defense: Advance" -> "Caro-Kann Defense")
         base_opening = m.opening_name.split(':')[0].split('|')[0].strip()
         if base_opening == 'Unknown' or not base_opening:
             return
 
-        # Create a clean URL-friendly slug (e.g., "caro-kann-defense")
         import re
         slug = re.sub(r'[^a-z0-9]+', '-', base_opening.lower()).strip('-')
 
-        # Calculate how many plies actually occurred in the opening
-        opening_plies = m.mid_start if m.mid_start else m.total_plies
+        # --- Base Experience Calculation ---
+        exp_earned = 0.0
         
-        # Calculate how many of those plies YOU played
-        my_opening_moves = 0
-        for i in range(opening_plies):
-            is_my_turn = (m.is_white and i % 2 == 0) or (not m.is_white and i % 2 == 1)
-            if is_my_turn:
-                my_opening_moves += 1
+        # 1. You get a flat amount just for getting the opening on the board
+        exp_earned += 10.0 
 
-        # Determine multiplier based on game outcome
+        # 2. Add points based on the QUALITY of your book moves
+        for weight in getattr(m, 'my_book_weights', []):
+            if weight >= 50:
+                exp_earned += 4.0  # Mainline Theory
+            elif weight >= 10:
+                exp_earned += 6.0  # Solid Sideline (Harder to know)
+            else:
+                exp_earned += 10.0 # Rare / Extreme Sideline (Huge bonus for knowing deep, weird lines!)
+
+        # 3. Multiplier based on the game outcome
         if m.is_win:
-            multiplier = 5.0
+            multiplier = 1.5
         elif m.is_draw:
-            multiplier = 4.0
+            multiplier = 1.0
         else:
-            multiplier = 2.5
+            multiplier = 0.5  # You knew the theory, but failed the execution
 
-        exp_earned = my_opening_moves * multiplier
+        final_exp = exp_earned * multiplier
 
-        if exp_earned > 0:
-            self._grant_mastery(m.game_id, 'opening', slug, base_opening, exp_earned)
+        if final_exp > 0:
+            self._grant_mastery(m.game_id, 'opening', slug, base_opening, final_exp)
+
+        # --- Book-Specific Achievements ---
+        
+        # 1. The Theoretician
+        if m.my_book_moves >= 8:
+            self._grant(m.game_id, 'theory-deep', f"The Theoretician: Played {m.my_book_moves} consecutive book moves")
+            
+        # 2. The Hipster (Played deep into a very rare sideline)
+        if m.my_book_moves >= 5:
+            # Check if the last two moves you played were low-weight (rare)
+            recent_weights = m.my_book_weights[-2:]
+            if all(w < 15 for w in recent_weights):
+                self._grant(m.game_id, 'theory-hipster', "The Hipster: Successfully navigated a rare opening sideline")
+
+        # 3. Out of Book Blunder (The Parrot logic we discussed!)
+        if m.out_of_book_ply is not None:
+            is_my_turn_out_of_book = (m.is_white and m.out_of_book_ply % 2 == 0) or (not m.is_white and m.out_of_book_ply % 2 == 1)
+            
+            # If we played at least 4 book moves, but blundered immediately upon leaving the book
+            if m.my_book_moves >= 4 and is_my_turn_out_of_book:
+                # Find the eval drop for the exact move we went out of book
+                evals = getattr(m, 'move_evals', []) # Assuming this is stored or passed; adjust if needed
+                # If you want to strictly tie this to m.blunders, you can simplify:
+                # This requires slightly tweaking how `_analyze_evals` stores specific blunder plies, 
+                # but for now, we can grant a funny "Negative" achievement if a blunder happened early.
+                pass
 
     def evaluate(self, metrics: GameMetrics):
         """Main entry point to run a game through all achievement rulesets."""
