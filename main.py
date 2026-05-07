@@ -23,6 +23,8 @@ def main():
                         help="Print all qualified achievements for the game, even if already granted")
     parser.add_argument("--debug", action="store_true", 
                         help="Enable highly verbose debug logging")
+    parser.add_argument("--export-pgn", action="store_true", 
+                    help="Export annotated PGNs to /debug/pgn_files/")
     
     args = parser.parse_args()
 
@@ -61,7 +63,8 @@ def main():
     process_achievements(
         username=args.user, 
         limit=scan_limit, 
-        show_all=args.show_achievements
+        show_all=args.show_achievements,
+        export_pgn=args.export_pgn
     )
     
     print("✅ All done!")
