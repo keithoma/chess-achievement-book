@@ -122,40 +122,23 @@ def show_history(username: str, limit: int = 10):
                 return
 
             for game_id, recent_grant, game_data_raw in recent_games:
-                # Ensure game_data is a dictionary
                 game_data = game_data_raw if isinstance(game_data_raw, dict) else json.loads(game_data_raw)
                 
-                # 1. Extract Player Names
-                white_player = game_data.get("players", {}).get("white", {})
-                black_player = game_data.get("players", {}).get("black", {})
+                # 1. Names
+                white = game_data.get("players", {}).get("white", {}).get("user", {}).get("name", "Unknown")
+                black = game_data.get("players", {}).get("black", {}).get("user", {}).get("name", "Unknown")
                 
-                # Dig into the Lichess nesting we saw in your JSON dump
-                white = white_player.get("user", {}).get("name", white_player.get("id", "Unknown"))
-                black = black_player.get("user", {}).get("name", black_player.get("id", "Unknown"))
-                
-                # 2. Extract Opening Name
+                # 2. Openings (Matching your JSON dump exactly)
                 opening_obj = game_data.get("opening", {})
-                opening = opening_obj.get("name", "Unknown Opening") if isinstance(opening_obj, dict) else "Unknown Opening"
-                
+                opening = "Unknown Opening"
+                if isinstance(opening_obj, dict):
+                    opening = opening_obj.get("name", "Unknown Opening")
+
                 date_str = _format_date(recent_grant)
                 
-                # 3. Print Header
                 print(f"\n⚔️  {white} vs {black}")
                 print(f"   Opening: {opening}")
                 print(f"   [ID: {game_id} | Scanned: {date_str}]")
                 print("-" * 90)
-                
-                cur.execute(ledger_query, (game_id, username))
-                grants = cur.fetchall()
-                
-                for name, desc, ach_type, amount, tier in grants:
-                    if ach_type == 'feat' or ach_type == 'story':
-                        print(f"   🎉 UNLOCKED: {name:<20} ({desc})")
-                    elif ach_type == 'mastery':
-                        print(f"   📈 {name:<20} | +{amount} EXP  ({desc})")
-                    elif ach_type == 'badge':
-                        print(f"   📊 {name:<20} | +{amount} Prog | ({desc})")
-                        if tier:
-                            print(f"      🏅 BADGE UPGRADED! Reached {tier.upper()} tier!")
                         
     print(f"\n{'='*90}\n")

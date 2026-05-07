@@ -101,13 +101,8 @@ class AchievementScanner:
             progress_amount = badge_triggers.get(badge_id, 0)
             
             if progress_amount > 0:
-                # We will add Tier-Up logic later. For now, just record the raw progress!
-                self.ledger.record_progress(
-                    game_id=metrics.game_id, 
-                    def_id=badge_id, 
-                    amount=progress_amount, 
-                    newly_unlocked_tier=None
-                )
+                self.ledger.record_progress(metrics.game_id, badge_id, progress_amount)
+
         for badge in self.configs["badge"]:
             badge_id = badge["id"]
             progress_amount = badge_triggers.get(badge_id, 0)
@@ -117,12 +112,7 @@ class AchievementScanner:
                 # but you would compare current DB progress + amount vs JSON config tiers)
                 new_tier = None 
                 
-                self.ledger.record_progress(
-                    game_id=metrics.game_id, 
-                    def_id=badge_id, 
-                    amount=progress_amount, 
-                    newly_unlocked_tier=new_tier
-                )
+                self.ledger.record_progress(metrics.game_id, mastery_def["id"], exp)
 
     def _evaluate_mastery(self, metrics: GameMetrics):
         """Matches ECO codes and awards EXP for opening mastery."""
@@ -130,8 +120,9 @@ class AchievementScanner:
         opening_name = metrics.opening_name
         my_color = "white" if metrics.is_white else "black"
 
-        for mastery in self.configs["mastery"]:
-            cond = mastery.get("config", {}).get("conditions", {})
+        # Fix: Ensure we use 'mastery_def' consistently to avoid NameErrors
+        for mastery_def in self.configs.get("mastery", []):
+            cond = mastery_def.get("config", {}).get("conditions", {})
             
             if cond.get("color") not in ["any", my_color]:
                 continue
@@ -140,11 +131,11 @@ class AchievementScanner:
             matched_name = any(n in opening_name for n in cond.get("name_includes", []))
 
             if matched_eco or matched_name:
-                # Calculate EXP based on accuracy (Simplified example)
                 exp = 50 if metrics.is_win else 10
                 if metrics.blunders == 0: exp += 25
                 
-                self.ledger.record_progress(metrics.game_id, mastery["id"], exp)
+                # Use mastery_def['id'] here
+                self.ledger.record_progress(metrics.game_id, mastery_def["id"], exp)
 
     def _evaluate_feats(self, metrics: GameMetrics):
         """Checks for highly specific, one-time geometric/situational occurrences."""
