@@ -28,7 +28,7 @@ def main():
     Parse command-line arguments and initiate the achievement tracking pipeline.
     """
     parser = argparse.ArgumentParser(description="Chess Achievement Tracker")
-    parser.add_argument("-l", "--limit", type=int, default=1,
+    parser.add_argument("-l", "--limit", type=int, default=10,
                         help="Number of recent games to pull from Lichess (Default: 50)")
     parser.add_argument("-u", "--user", type=str, default="noctu2nality",
                         help="Lichess username to target")

@@ -1,0 +1,60 @@
+---
+###############################################################################
+# SECTION 1: TAKING MATERIAL
+###############################################################################
+- id: badge_clean_pawns
+  type: badge
+  category: Material
+  subcategory: 
+  name: Pawn Snatcher
+  description: Number of clean pawns won (the pawn winning move is not a mistake nor a blunder and the pawn is kept for 5 or more turns).
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_clean_knight
+  type: badge
+  category: Material
+  subcategory: 
+  name: Knight Snatcher
+  description: Number of clean knights won (the knight winning move is not a mistake nor a blunder and the knight is kept for 5 or more turns).
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_clean_bishop
+  type: badge
+  category: Material
+  subcategory: 
+  name: Bishop Snatcher
+  description: Number of clean bishops won (the bishop winning move is not a mistake nor a blunder and the bishop is kept for 5 or more turns).
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_clean_rook
+  type: badge
+  category: Material
+  subcategory: 
+  name: Rook Snatcher
+  description: Number of clean rooks won (the rook winning move is not a mistake nor a blunder and the rook is kept for 5 or more turns).
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+- id: badge_clean_queen
+  type: badge
+  category: Material
+  subcategory: 
+  name: Queen Snatcher
+  description: Number of clean queens won (the queen winning move is not a mistake nor a blunder and the queen is kept for 5 or more turns).
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---

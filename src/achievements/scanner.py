@@ -149,7 +149,7 @@ class AchievementScanner:
         pass
 
     def _export_annotated_pgn(self, game_data: Dict[str, Any]):
-        """Saves the Stockfish-annotated PGN to the debug folder."""
+        """Saves annotated PGN with robust name and opening detection."""
         output_dir = Path("debug/pgn_files")
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -157,25 +157,45 @@ class AchievementScanner:
         if not annotated_content:
             return 
 
-        # Lichess uses 'createdAt' in milliseconds
-        ms_timestamp = game_data.get('createdAt', 0)
-        date_str = datetime.fromtimestamp(ms_timestamp / 1000.0).strftime("%Y%m%d")
+        # 1. Date Extraction (Handle seconds or milliseconds)
+        ts = game_data.get('timestamp') or (game_data.get('createdAt', 0) / 1000)
+        date_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
         
-        # Determine user color for the filename
-        white_id = game_data.get('players', {}).get('white', {}).get('user', {}).get('id', '')
-        is_white = white_id.lower() == self.username.lower()
-        color_str = "white" if is_white else "black"
+        # 2. Aggressive Player Name Extraction
+        def get_name(color):
+            p = game_data.get('players', {}).get(color, {})
+            # Tries: user.name -> name -> user.id -> id
+            return (p.get('user', {}).get('name') or 
+                    p.get('name') or 
+                    p.get('user', {}).get('id') or 
+                    p.get('id') or "Unknown")
 
-        opening_name = game_data.get('opening', {}).get('name', 'Unknown')
+        white = get_name('white')
+        black = get_name('black')
+
+        # 3. Aggressive Opening Extraction
+        # Look at top level, then fall back to the raw API response
+        opening_data = game_data.get('opening')
+        if not opening_data:
+            opening_data = game_data.get('raw_api_response', {}).get('opening')
+
+        opening_name = "Unknown Opening"
+        if isinstance(opening_data, dict):
+            opening_name = opening_data.get('name', "Unknown Opening")
+        elif isinstance(opening_data, str):
+            opening_name = opening_data
+
+        # Strip illegal characters for Windows/Linux/Mac filenames
         safe_opening = re.sub(r'[\\/*?:"<>|]', "", opening_name)
 
-        filename = f"{date_str} {color_str} {safe_opening}.pgn"
+        # 4. Final filename assembly
+        filename = f"{date_str} - {white} vs {black} - {safe_opening}.pgn"
         file_path = output_dir / filename
 
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(annotated_content)
         
-        logger.info("  📄 Exported Debug PGN: %s", filename)
+        logger.info("  📄 Exported: %s", filename)
 
 
 def process_achievements(username: str, limit: int = None, show_all: bool = False, export_pgn: bool = False):

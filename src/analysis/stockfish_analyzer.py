@@ -139,8 +139,6 @@ class AchievementAnalyzer:
             node.nags.add(4)  # ?? (Blunder)
         elif delta > 0.10:
             node.nags.add(2)  # ? (Mistake)
-        elif delta > 0.05:
-            node.nags.add(6)  # ?! (Inaccuracy)
         
         # --- POSITIVE ---
         elif delta < 0.01:

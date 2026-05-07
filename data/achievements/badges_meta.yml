@@ -220,4 +220,74 @@
       silver: 50
       gold: 250
 ---
-
+###############################################################################
+# SECTION 5: PROMOTION
+###############################################################################
+- id: badge_promotion
+  type: badge
+  category: Material
+  subcategory: 
+  name: Promotion Master
+  description: Number of all promotions achieved.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 5: RATING
+###############################################################################
+- id: badge_upset
+  type: badge
+  category: Underdog
+  name: Giant Slayer
+  description: Beat an opponent rated 100+ points higher than you.
+  config:
+    tiers: { bronze: 5, silver: 25, gold: 100 }
+- id: hold_your_own
+  type: badge
+  category: Underdog
+  name: Hold Your Own
+  description: draw an opponent rated 200 or more points than you
+  config:
+    tiers: { bronze: 10, silver: 50, gold: 250 }
+---
+###############################################################################
+# SECTION 5: WIN STREAKS
+###############################################################################
+- id: badge_win_streak
+  type: badge
+  category: Win Streaks
+  name: Winning Streak
+  description: win three games in a row
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
+---
+###############################################################################
+# SECTION 5: OPENING DIVERSITY
+###############################################################################
+- id: badge_opening_diversity
+  type: badge
+  category: Variety
+  name: Jack of all Trades
+  description: Play 20 different opening variations (ECO codes).
+  config:
+    tiers: { bronze: 20, silver: 50, gold: 100 }
+---
+###############################################################################
+# SECTION 5: WIN GAMES BASED ON TIME
+###############################################################################
+- id: badge_win_on_weekends
+  type: badge
+  category: Win Streaks
+  name: Weekend Warrior
+  description: Win a game on a weekend.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250
