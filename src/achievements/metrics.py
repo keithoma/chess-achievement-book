@@ -1,3 +1,4 @@
+import math
 import chess
 import chess.polyglot
 import os
