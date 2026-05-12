@@ -12,10 +12,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from psycopg import Connection, Cursor
 
-# Load environment variables from .env file
 load_dotenv()
-
-# The Connection URI is our primary secret; fetch it from the environment
 DB_URI: Optional[str] = os.getenv("DATABASE_URL")
 
 def get_connection() -> Connection:
