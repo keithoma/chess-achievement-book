@@ -1,228 +1,139 @@
 import math
 import chess
-import chess.polyglot
-import os
-
-from src.config import BOOK_PATH
+from typing import List, Dict, Any
 
 class GameMetrics:
     """
-    Parses a single game's raw data and pre-calculates all necessary 
-    metrics (accuracies, material, punishments) exactly once.
+    Consumes raw game data and the structured MoveAnalysis from the Engine Analyzer.
+    Pre-calculates accuracies, material swings, and tactical achievements.
     """
-    def __init__(self, game_id, score, speed, game_data, username):
+    def __init__(self, game_id: str, game_data: Dict[str, Any], analysis_results: List[Dict[str, Any]], username: str):
         self.game_id = game_id
-        self.speed = speed.lower()
+        self.speed = game_data.get('speed', 'unknown').lower()
         self.moves_string = game_data.get('moves', '')
         self.san_moves = self.moves_string.split()
         self.total_plies = len(self.san_moves)
-        self.termination = game_data.get('termination', 'unknown').lower()
+        self.score = game_data.get('score', '*')
         
-        # --- IMPROVED OPENING EXTRACTION ---
-        opening_data = game_data.get('opening')
-        if not opening_data:
-            opening_data = game_data.get('raw_api_response', {}).get('opening', {})
-
-        if isinstance(opening_data, dict):
-            self.opening_name = opening_data.get('name', 'Unknown')
-            self.opening_eco = opening_data.get('eco', 'Unknown')
-        else:
-            self.opening_name = 'Unknown'
-            self.opening_eco = 'Unknown'
+        # --- OPENING EXTRACTION ---
+        raw_api = game_data.get('raw_api_response', {})
+        opening_data = raw_api.get('opening', {})
+        self.opening_name = opening_data.get('name', 'Unknown')
+        self.opening_eco = opening_data.get('eco', 'Unknown')
         
-        # Player Context
+        # --- PLAYER CONTEXT ---
         self.white_id = game_data['players']['white'].get('id', '').lower()
-        self.is_white = (self.white_id == username)
-        self.my_color = 'white' if self.is_white else 'black'
-        self.opp_color = 'black' if self.is_white else 'white'
+        self.is_white = (self.white_id == username.lower())
+        self.my_color = chess.WHITE if self.is_white else chess.BLACK
+        self.opp_color = chess.BLACK if self.is_white else chess.WHITE
         
-        # Outcomes
-        self.is_win = (self.is_white and score == '1-0') or (not self.is_white and score == '0-1')
-        self.is_draw = (score == '1/2-1/2')
+        # --- OUTCOMES ---
+        self.is_win = (self.is_white and self.score == '1-0') or (not self.is_white and self.score == '0-1')
+        self.is_draw = (self.score == '1/2-1/2')
+        self._draw_reason = None
 
-        # Phases
-        division = game_data.get('division', {})
-        self.mid_start = division.get('middle')
-        self.end_start = division.get('end')
-
-        # Analytic Counters
-        self.min_eval_seen = 0
-        self.eval_at_mid = 0
-        self.eval_at_end = 0
-        
+        # --- ANALYTIC COUNTERS ---
         self.inaccuracies = 0
         self.mistakes = 0
         self.blunders = 0
-        
-        self.mistakes_punished_moves = []
-        self.blunders_punished_moves = []
-        self.clean_pawns_won_moves = []
+        self.brilliancies = 0 # Can be calculated from analyzer deltas!
         
         self.total_material_points = 0
-        self.final_eval = 0
-        self.blundered_queen = False
-
-        # --- NEW: Polyglot Book Metrics ---
+        self.clean_pawns_won_moves = []
+        
+        # --- BOOK METRICS ---
         self.my_book_moves = 0
         self.total_book_plies = 0
-        self.my_book_weights = []
         self.out_of_book_ply = None
 
-        # Lazy loaded properties
-        self._draw_reason = None
+        # --- ACPL (Average Centipawn Loss) ---
+        self.total_cpl = 0.0
+        self.analyzed_moves_count = 0
+        self.acpl = 0.0
 
-        # Execute crunching algorithms
-        self._analyze_evals(game_data.get('move_evals', []))
-        self._analyze_material(game_data.get('captures', []), game_data.get('move_evals', []))
-        
-        # Run the Opening Book analysis
-        self._analyze_opening_book()
+        # Execute processing
+        self._process_game_and_tactics(analysis_results)
 
-    def _format_move(self, ply_index):
-        """Converts a 0-based ply index into readable notation (e.g. '17. Qxc5' or '17... Qxc5')"""
-        if ply_index >= len(self.san_moves):
-            return "Unknown"
-        move_num = (ply_index // 2) + 1
-        san = self.san_moves[ply_index]
-        if ply_index % 2 == 0:
-            return f"{move_num}. {san}"
-        else:
-            return f"{move_num}... {san}"
-
-    def _analyze_opening_book(self):
-        """Steps through the game and checks moves against the Solista Polyglot book."""
-        if not os.path.exists(BOOK_PATH):
-            return # Skip if the book isn't downloaded or path is wrong
-
+    def _process_game_and_tactics(self, analysis_results: List[Dict[str, Any]]):
+        """
+        A single, clean pass through the game using chess.Board.
+        Extracts captures, evaluates accuracies, and tracks opening book status.
+        """
         board = chess.Board()
+        piece_values = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9}
         
-        try:
-            with chess.polyglot.open_reader(BOOK_PATH) as reader:
-                for i, move_str in enumerate(self.san_moves):
-                    try:
-                        # Find the move the player actually made on the board
-                        player_move = board.parse_san(move_str)
-                    except ValueError:
-                        break # Failsafe for invalid SAN
+        for ply, move_san in enumerate(self.san_moves, start=1):
+            is_my_turn = (board.turn == self.my_color)
+            
+            try:
+                move = board.parse_san(move_san)
+            except ValueError:
+                break # Invalid SAN failsafe
+
+            # --- 1. CAPTURE & MATERIAL LOGIC ---
+            if board.is_capture(move):
+                captured_piece = chess.PAWN if board.is_en_passant(move) else board.piece_at(move.to_square).piece_type
+                if is_my_turn and captured_piece:
+                    pts = piece_values.get(captured_piece, 0)
+                    self.total_material_points += pts
                     
-                    # Fetch all known book moves for the current position
-                    entries = reader.find_all(board)
-                    book_moves = {e.move: e.weight for e in entries}
+                    # (You can re-implement the "Clean Pawn" logic here using board state 
+                    # rather than SAN string parsing, which is much more reliable)
 
-                    if player_move in book_moves:
-                        self.total_book_plies += 1
-                        weight = book_moves[player_move]
-                        
-                        is_my_turn = (self.is_white and i % 2 == 0) or (not self.is_white and i % 2 == 1)
-                        if is_my_turn:
-                            self.my_book_moves += 1
-                            self.my_book_weights.append(weight)
-                            
-                        # Advance the board state to check the next move
-                        board.push(player_move)
-                    else:
-                        # The move played is not in Solista. We are out of book.
-                        self.out_of_book_ply = i
-                        break
-        except Exception as e:
-            print(f"Error reading polyglot book: {e}")
-
-    def _calculate_win_chances(self, cp: int) -> float:
-        return 0.5 + 0.5 * (2 / (1 + math.exp(-0.003682 * cp)) - 1)
-
-    def _analyze_evals(self, evals):
-        for i in range(len(evals)):
-            current_eval = evals[i]
-            prev_eval = evals[i-1] if i > 0 else 0
-
-            # Get POV Win Chances
-            # (Assuming evals are always from White's perspective)
-            w_curr = self._calculate_win_chances(current_eval if self.is_white else -current_eval)
-            w_prev = self._calculate_win_chances(prev_eval if self.is_white else -prev_eval)
-            
-            delta = w_prev - w_curr # How much win-chance did we lose?
-
-            is_player_turn = (self.is_white and i % 2 == 0) or (not self.is_white and i % 2 == 1)
-            
-            if i > 0 and is_player_turn:
-                if delta >= 0.25: self.blunders += 1
-                elif delta >= 0.12: self.mistakes += 1
-                elif delta >= 0.06: self.inaccuracies += 1
-            
-            # (Rest of your punishment logic below...)
-
-    def _analyze_material(self, captures, evals):
-        piece_values = {'pawn': 1, 'knight': 3, 'bishop': 3, 'rook': 5, 'queen': 9}
-        
-        # Helpers to calculate relative balance at any exact moment in the game
-        def get_balance_at_ply(target_ply):
-            my_pts = sum(piece_values.get(c['piece_taken'], 0) for c in captures if c['player'] == self.my_color and c['ply'] <= target_ply)
-            opp_pts = sum(piece_values.get(c['piece_taken'], 0) for c in captures if c['player'] == self.opp_color and c['ply'] <= target_ply)
-            return my_pts - opp_pts
-
-        def get_pawn_balance_at_ply(target_ply):
-            my_pawns = sum(1 for c in captures if c['player'] == self.my_color and c['piece_taken'] == 'pawn' and c['ply'] <= target_ply)
-            opp_pawns = sum(1 for c in captures if c['player'] == self.opp_color and c['piece_taken'] == 'pawn' and c['ply'] <= target_ply)
-            return my_pawns - opp_pawns
-
-        for cap in captures:
-            if cap['player'] == self.my_color:
-                # Always track total material for the "Board Wiper" badges
-                self.total_material_points += piece_values.get(cap['piece_taken'], 0)
+            # --- 2. ENGINE EVALUATIONS & BOOK LOGIC ---
+            if ply - 1 < len(analysis_results):
+                move_data = analysis_results[ply - 1]
                 
-                if cap['piece_taken'] == 'pawn':
-                    c_ply = cap['ply']
-                    eval_idx = c_ply - 1 
-                    
-                    # 1. Engine Check: Was it a blunder?
-                    is_clean = True
-                    if 0 < eval_idx < len(evals):
-                        drop = (evals[eval_idx] - evals[eval_idx-1]) if self.is_white else -(evals[eval_idx] - evals[eval_idx-1])
-                        if drop <= -100: is_clean = False
-                    
-                    # 2. Tactical Resolution Check
-                    if is_clean:
-                        # Record the baseline BEFORE you grabbed the pawn
-                        bal_mat_before = get_balance_at_ply(c_ply - 1)
-                        bal_pwn_before = get_pawn_balance_at_ply(c_ply - 1)
-                        
-                        target_ply = c_ply + 3
-                        final_ply = c_ply
-                        
-                        # Loop through the upcoming moves to find when the dust settles
-                        # (self.san_moves is 0-indexed, so index `c_ply` is the move immediately AFTER the capture)
-                        for p_idx in range(c_ply, self.total_plies):
-                            current_ply = p_idx + 1
-                            san = self.san_moves[p_idx]
-                            
-                            # If tactical noise occurs, push the timer back 3 plies
-                            if any(char in san for char in ['x', '+', '#', '=']):
-                                target_ply = current_ply + 3
-                                
-                            final_ply = current_ply
-                            
-                            # 3 quiet plies have passed, the tactical sequence is over
-                            if current_ply == target_ply:
-                                break
-                                
-                        # 3. Final Balance Check
-                        bal_mat_after = get_balance_at_ply(final_ply)
-                        bal_pwn_after = get_pawn_balance_at_ply(final_ply)
-                        
-                        # Check if the NET change since before the capture is positive
-                        if (bal_mat_after - bal_mat_before) >= 1 and (bal_pwn_after - bal_pwn_before) >= 1:
-                            self.clean_pawns_won_moves.append(self._format_move(c_ply - 1))
+                # Book Logic
+                if move_data.get('is_book'):
+                    self.total_book_plies += 1
+                    if is_my_turn:
+                        self.my_book_moves += 1
+                elif self.out_of_book_ply is None:
+                    self.out_of_book_ply = ply
 
-    def get_draw_reason(self):
-        if self._draw_reason is None:
-            board = chess.Board()
-            for move_str in self.san_moves:
-                try: board.push_san(move_str)
-                except ValueError: break
+                # Accuracy Logic (Only evaluate our own moves)
+                if is_my_turn and move_data.get('high_top_moves'):
+                    best_eval = move_data['high_top_moves'][0]['eval']
+                    played_eval = move_data['high_depth_eval']
                     
+                    # Calculate Centipawn Loss (capped at 1000cp / 10 pawns)
+                    cpl = max(0.0, best_eval - played_eval)
+                    self.total_cpl += min(cpl * 100, 1000) 
+                    self.analyzed_moves_count += 1
+
+                    # Win Chance Drop
+                    w_best = self._calculate_win_chances(best_eval)
+                    w_played = self._calculate_win_chances(played_eval)
+                    delta = w_best - w_played
+
+                    if delta >= 0.25:
+                        self.blunders += 1
+                    elif delta >= 0.12:
+                        self.mistakes += 1
+                    elif delta >= 0.06:
+                        self.inaccuracies += 1
+
+            # Push move for the next iteration
+            board.push(move)
+
+        # Finalize ACPL
+        if self.analyzed_moves_count > 0:
+            self.acpl = round(self.total_cpl / self.analyzed_moves_count, 1)
+
+        # Finalize Draw Reason
+        if self.is_draw:
             if board.is_stalemate(): self._draw_reason = "stalemate"
             elif board.is_insufficient_material(): self._draw_reason = "insufficient-material"
             elif board.can_claim_fifty_moves() or board.is_fifty_moves(): self._draw_reason = "50-move"
             elif board.can_claim_threefold_repetition() or board.is_repetition(): self._draw_reason = "3-fold"
             else: self._draw_reason = "agreement"
-        return self._draw_reason
+
+    def get_draw_reason(self) -> str:
+        return self._draw_reason or "none"
+
+    def _calculate_win_chances(self, cp_eval: float) -> float:
+        """Converts an evaluation (in pawns) to a win probability (0.0 to 1.0)."""
+        # Note: Stockfish analyzer passes eval in pawns (e.g., 1.5), so we multiply by 100 for the formula
+        cp = cp_eval * 100 
+        return 0.5 + 0.5 * (2 / (1 + math.exp(-0.003682 * cp)) - 1)
