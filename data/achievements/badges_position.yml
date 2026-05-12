@@ -22,3 +22,18 @@
   config:
     tiers: { bronze: 1, silver: 10, gold: 50 }
 ---
+
+###############################################################################
+# SECTION 5: PROMOTION
+###############################################################################
+- id: badge_promotion
+  type: badge
+  category: Material
+  subcategory: 
+  name: Promotion Master
+  description: Number of all promotions achieved.
+  config:
+    tiers:
+      bronze: 10
+      silver: 50
+      gold: 250

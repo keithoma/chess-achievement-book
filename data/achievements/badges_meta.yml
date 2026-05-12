@@ -1,10 +1,23 @@
 ---
+####################################################################################################
+#                                                                                                  #
+#   ####   ###  #   # #####  ####      ####  #      ###  #   # ##### ####      #   #  ###  #   #   #
+#  #      #   # ## ## #     #          #   # #     #   # #   # #     #   #     #   # #   # ##  #   #
+#  #  ##  ##### # # # ####   ###       ####  #     #####  # #  ####  #   #     # # # #   # # # #   #
+#  #   #  #   # #   # #         #      #     #     #   #   #   #     #   #     # # # #   # #  ##   #
+#   ####  #   # #   # ##### ####       #     ##### #   #   #   ##### ####       # #   ###  #   #   #
+#                                                                                                  #
+####################################################################################################
+
+
+
 ###############################################################################
 # OBSESSION
 # Total games played across all time controls.
 ###############################################################################
 # subcategory could be `Guru`
 # I'm not sure if the category ultrabullet actually exists ... I mean we have the clock data anyway, but let's do that later
+# what about hyperbullet?
 - id: badge_played_total
   type: badge
   category: Veterancy
@@ -80,31 +93,68 @@
         tier-flavor-text: '*I\'m considering not counting ultrabullet games in the next update.*'
 
 
-
+###############################################################################
+# 
+# Total Ultra Bullet games played.
+###############################################################################
 - id: badge_played_ultrabullet
   type: badge
   category: Veterancy
   subcategory:
   name:
+  badge-flavor-text:
   description: 'Total Ultra Bullet games played.'
   config:
     tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
 
 
 
-- id: badge_played_bullet
+###############################################################################
+# 
+# Total Ultra Bullet games won.
+###############################################################################
+- id: badge_won_ultrabullet
   type: badge
-  category: Volume
-  name: Bullet Sprinter
-  description: Total Bullet games played.
+  category: Veterancy
+  subcategory:
+  name:
+  badge-flavor-text:
+  description: 'Total Ultra Bullet games won.''
   config:
     tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
+
+
+
+###############################################################################
+# 
+# Total Bullet games played.
+###############################################################################
+- id: badge_played_bullet
+  type: badge
+  category: Veterancy
+  subcategory:
+  name:
+  description: 'Total Bullet games played.'
+  badge-flavor-text:
+  config:
+    tiers:
+
+
+
+###############################################################################
+# 
+# Total Bullet games won.
+###############################################################################
+- id: badge_won_bullet
+  type: badge
+  category: Veterancy
+  subcategory
+  name:
+  description: 'Total Bullet games won.'
+  badge-flavor-text:
+  config:
+    tiers:
+
 
 
 ###############################################################################
@@ -187,73 +237,84 @@
         tier-flavor-text: '**'
 
 
+
+###############################################################################
+#
+# Total Rapid games played.
+###############################################################################
 - id: badge_played_rapid
   type: badge
-  category: Volume
-  name: Rapid Thinker
-  description: Total Rapid games played.
+  category: Veterancy
+  subcategory:
+  name:
+  description: 'Total Rapid games played.'
+  badge-flavor-text:
   config:
     tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
-- id: badge_played_classical
-  type: badge
-  category: Volume
-  name: Classical Scholar
-  description: Total Classical games played.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
----
-###############################################################################
-# SECTION 2: GAMES WON
-###############################################################################
 
-- id: badge_won_ultrabullet
-  type: badge
-  category: Combat
-  name: Ultra Victor
-  description: Total Ultra Bullet games won.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
-- id: badge_won_bullet
-  type: badge
-  category: Combat
-  name: Bullet Sniper
-  description: Total Bullet games won.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
 
+
+###############################################################################
+#
+# Total Rapid games won.
+###############################################################################
 - id: badge_won_rapid
   type: badge
-  category: Combat
+  category: Veterancy
+  subcategory:
   name: Rapid Master
-  description: Total Rapid games won.
+  description: 'Total Rapid games won.'
+  badge-flavor-text:
   config:
     tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
+
+
+
+###############################################################################
+#
+# Total Classical games played.
+###############################################################################
+- id: badge_played_classical
+  type: badge
+  category: Veterancy
+  subcategory:
+  name:
+  description: 'Total Classical games played.'
+  badge-flavor-text:
+  config:
+    tiers:
+
+
+
+###############################################################################
+#
+# Total Classical games won.
+###############################################################################
 - id: badge_won_classical
   type: badge
-  category: Combat
-  name: Classical Master
-  description: Total Classical games won.
+  category: Veterancy
+  subcategory:
+  name:
+  description: 'Total Classical games won.'
+  badge-flavor-text:
   config:
     tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
+
+
+
 ---
+####################################################################################################
+#                                                                                                  #
+#  #   #  ###  #   #      ####   #   #   ###    ####  #####                                        #
+#  #   #   #   ##  #      #   #  #   #  #   #  #      #                                            #
+#  # # #   #   # # #      ####   #####  #####   ###   ####                                         #
+#  # # #   #   #  ##      #      #   #  #   #      #  #                                            #
+#   # #   ###  #   #      #      #   #  #   #  ####   #####                                        #
+#                                                                                                  #
+####################################################################################################
+
+
+
 ###############################################################################
 # SECTION 3: WIN PHASE
 ###############################################################################
@@ -287,80 +348,48 @@
       bronze: 10
       silver: 50
       gold: 250
+
+
+
 ---
-###############################################################################
-# SECTION 4: WIN METHOD
-###############################################################################
-- id: badge_win_method_checkmate
+####################################################################################################
+#                                                                                                  #
+#  ####   ###  ##### #####      ###  #   # ####       ##### ### #   # #####                        #
+#  #   # #   #   #   #         #   # ##  # #   #        #    #  ## ## #                            #
+#  #   # #####   #   ####      ##### # # # #   #        #    #  # # # ####                         #
+#  #   # #   #   #   #         #   # #  ## #   #        #    #  #   # #                            #
+#  ####  #   #   #   #####     #   # #   # ####         #   ### #   # #####                        #
+#                                                                                                  #
+####################################################################################################
+
+# also include daily streaks
+
+- id: badge_win_on_weekends
   type: badge
-  category: Termination
-  name: The Executioner
-  description: Win a game by delivering checkmate.
+  category: Win Streaks
+  name: Weekend Warrior
+  description: Win a game on a weekend.
   config:
     tiers:
       bronze: 10
       silver: 50
       gold: 250
-- id: badge_win_method_resignation
-  type: badge
-  category: Termination
-  name: Psychological Warfare
-  description: Win a game by forcing your opponent to resign.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
-- id: badge_win_method_timeout
-  type: badge
-  category: Termination
-  name: Clock Management
-  description: Win a game by your opponent running out of time.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
-- id: badge_win_method_abandonment
-  type: badge
-  category: Termination
-  name: Rage Quitter's Bane
-  description: Win a game by opponent abandonment.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
+
+
+
 ---
-###############################################################################
-# SECTION 4: MOVE LENGTH
-###############################################################################
-- id: badge_marathon
-  type: badge
-  category: Volume
-  name: Iron Lung
-  description: Win a game that is longer than 80 moves.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
----
-###############################################################################
-# SECTION 5: PROMOTION
-###############################################################################
-- id: badge_promotion
-  type: badge
-  category: Material
-  subcategory: 
-  name: Promotion Master
-  description: Number of all promotions achieved.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
----
+####################################################################################################
+#                                                                                                  #
+#  #   #  ###  ####                                                                                #
+#  #   #   #   #   #                                                                               #
+#  # # #   #   ####                                                                                #
+#  # # #   #   #                                                                                   #
+#   # #   ###  #                                                                                   #
+#                                                                                                  #
+####################################################################################################
+
+
+
 ###############################################################################
 # SECTION 5: RATING
 ###############################################################################
@@ -375,23 +404,11 @@
   type: badge
   category: Underdog
   name: Hold Your Own
-  description: draw an opponent rated 200 or more points than you
+  description: draw an opponent rated 150 or more points than you
   config:
     tiers: { bronze: 10, silver: 50, gold: 250 }
 ---
-###############################################################################
-# SECTION 5: WIN STREAKS
-###############################################################################
-- id: badge_win_streak
-  type: badge
-  category: Win Streaks
-  name: Winning Streak
-  description: win three games in a row
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
+
 ---
 ###############################################################################
 # SECTION 5: OPENING DIVERSITY
@@ -404,16 +421,3 @@
   config:
     tiers: { bronze: 20, silver: 50, gold: 100 }
 ---
-###############################################################################
-# SECTION 5: WIN GAMES BASED ON TIME
-###############################################################################
-- id: badge_win_on_weekends
-  type: badge
-  category: Win Streaks
-  name: Weekend Warrior
-  description: Win a game on a weekend.
-  config:
-    tiers:
-      bronze: 10
-      silver: 50
-      gold: 250
