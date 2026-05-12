@@ -249,7 +249,7 @@
   subcategory:
   name:
   description: 'Total Rapid games played.'
-  badge-flavor-text: '*My boss makes a dollar, I make a dime. That\'s why I poop on company time.*'
+  badge-flavor-text: '*"My boss makes a dollar, I make a dime. That\'s why I poop on company time."*'
   config:
     tiers:
       pawn:
