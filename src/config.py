@@ -18,3 +18,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Engine Depth
 LOW_DEPTH = 1
 HIGH_DEPTH = 18
+
+# Grace Period for Checkmate Achievements
+MATE_GRACE_THRESHOLD = 2.0  # Centipawn eval threshold to trigger playout (+2.0 or -2.0)
+MATE_GRACE_PLIES = 20       # 10 full moves
+MATE_GRACE_DEPTH = 20       # Engine search depth for the playout moves
