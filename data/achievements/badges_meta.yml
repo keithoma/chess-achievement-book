@@ -16,7 +16,8 @@
 # Total games played across all time controls.
 ###############################################################################
 # subcategory could be `Guru`
-# I'm not sure if the category ultrabullet actually exists ... I mean we have the clock data anyway, but let's do that later
+# I'm not sure if the category ultrabullet actually exists ... I mean we have the clock data 
+# anyway, but let's do that later
 # what about hyperbullet?
 - id: badge_played_total
   type: badge
@@ -207,39 +208,39 @@
   category: Veterancy
   subcategory:
   name: 'Blitz Losern\'t'
-  description: Total Blitz games won.
+  description: 'Total Blitz games won.'
   badge-flavor-text: '*No time for losers.*'
   config:
     tiers:
       pawn:
-        amount:                1     # all the numbers here are from total games played -1
+        amount:                1     # here the joke is normal numbers, I guess
         tier-flavor-text: '*Why not? Here is a freebie.*'
       knight:
-        amount:               63     #
-        tier-flavor-text: '**'
+        amount:               10     #
+        tier-flavor-text: '*Amazing! We are all very proud of you.*'
       bishop:
-        amount:              255     #
-        tier-flavor-text: '**'
+        amount:               25     #
+        tier-flavor-text: '*"This progression feels suspiciously like a tutorial."*'
       rook:
-        amount:              399     #
-        tier-flavor-text: '**'
+        amount:               50     #
+        tier-flavor-text: '*Halfway there! You can do it!*'
       queen:
-        amount:             2499     #
-        tier-flavor-text: '**'
+        amount:              100     #
+        tier-flavor-text: '*Okay, the hand-holding is over.*'
       king:
-        amount:             4095     #
-        tier-flavor-text: '**'
+        amount:             2500     #
+        tier-flavor-text: '*Wait, you actually managed to do it?*'
       immortal:
-        amount:             8901     #
-        tier-flavor-text: '**'
+        amount:             5000     #
+        tier-flavor-text: '*You now have more Blitz wins than Magnus Carlsen does on one of his accounts. Nice.*'
       legend:
-        amount:            20000     # except for this number
-        tier-flavor-text: '**'
+        amount:            20000     #
+        tier-flavor-text: '*You got me. There is no more content here. See, the sky is just painted.*'
 
 
 
 ###############################################################################
-#
+# Restroom Rapid Ritual
 # Total Rapid games played.
 ###############################################################################
 - id: badge_played_rapid
@@ -248,9 +249,33 @@
   subcategory:
   name:
   description: 'Total Rapid games played.'
-  badge-flavor-text:
+  badge-flavor-text: '*My boss makes a dollar, I make a dime. That\'s why I poop on company time.*'
   config:
     tiers:
+      pawn:
+        amount:                5     # (Blitz 15) | 5 ply toiletpaper
+        tier-flavor-text: '*"Are your legs asleep already?"*'
+      knight:
+        amount:               19     # (Blitz 63) | I can't think of numerology related to restrooms, so just random prime numbers
+        tier-flavor-text: '*"i PlAy rApId gAmEs oUtSiDe oF tHe bAtHrOoM, tOo."*'
+      bishop:
+        amount:               83     #
+        tier-flavor-text: '**'
+      rook:
+        amount:              131     #
+        tier-flavor-text: '**'
+      queen:
+        amount:              829     #
+        tier-flavor-text: '*Just some feedback: Have you considered trying to win some of these?*'
+      king:
+        amount:             1367     #
+        tier-flavor-text: '*You have spent approximately 23 days of your finite lifespan playing Blitz.*'
+      immortal:
+        amount:             2969     #
+        tier-flavor-text: '*Rashid Nezhmetdinov was a Soviet chess Master and checkers player. Now you know.*'
+      legend:
+        amount:             5000     # obviously not prime
+        tier-flavor-text: '*Thank you for playing. Don\'t forget to like, comment, and subscribe, and hit that notification bell.*'
 
 
 
