@@ -12,8 +12,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from psycopg import Connection, Cursor
 
-load_dotenv()
-DB_URI: Optional[str] = os.getenv("DATABASE_URL")
+from src.config import DATABASE_URL
 
 def get_connection() -> Connection:
     """
@@ -26,10 +25,10 @@ def get_connection() -> Connection:
         psycopg.Error: If the connection could not be established.
         ValueError: If DATABASE_URL is missing from the .env file.
     """
-    if not DB_URI:
+    if not DATABASE_URL:
         raise ValueError("❌ DATABASE_URL not found in .env. Check your configuration.")
     
-    return psycopg.connect(DB_URI)
+    return psycopg.connect(DATABASE_URL)
 
 def test_connection() -> None:
     """
