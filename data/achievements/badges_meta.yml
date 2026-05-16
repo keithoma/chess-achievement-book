@@ -312,7 +312,7 @@
         tier-flavor-text: '*Congratulations!*'
       immortal:
         amount:              987     #
-        tier-flavor-text: '**'
+        tier-flavor-text: '*Okay, let\'s be real though: The online rapid pool is not very good compared to Blitz.*'
       legend:
         amount:             5000     # obviously not prime
         tier-flavor-text: '*You are not supposed to be in here. Leave immediately.*'
