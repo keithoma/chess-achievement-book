@@ -289,9 +289,33 @@
   subcategory:
   name: Rapid Master
   description: 'Total Rapid games won.'
-  badge-flavor-text:
+  badge-flavor-text: '*"I hate rapid." — Daniil Dubov, World Rapid Chess Champion*'
   config:
     tiers:
+      pawn:
+        amount:                5     # (Blitz 15) | 5 ply toiletpaper
+        tier-flavor-text: '*"Wait, am I actually good?"*'
+      knight:
+        amount:               19     # (Blitz 63) | I can't think of numerology related to restrooms, so just random prime numbers
+        tier-flavor-text: '*"i PlAy rApId gAmEs oUtSiDe oF tHe bAtHrOoM, tOo."*'
+      bishop:
+        amount:               83     #
+        tier-flavor-text: '**'
+      rook:
+        amount:              131     #
+        tier-flavor-text: '**'
+      queen:
+        amount:              829     #
+        tier-flavor-text: '*Just some feedback: Have you considered trying to win some of these?*'
+      king:
+        amount:             1367     #
+        tier-flavor-text: '*You have spent approximately 23 days of your finite lifespan playing Blitz.*'
+      immortal:
+        amount:             2969     #
+        tier-flavor-text: '*Rashid Nezhmetdinov was a Soviet chess Master and checkers player. Now you know.*'
+      legend:
+        amount:             5000     # obviously not prime
+        tier-flavor-text: '*Thank you for playing. Don\'t forget to like, comment, and subscribe, and hit that notification bell.*'
 
 
 
