@@ -1,26 +1,81 @@
 ---
 ###############################################################################
-# SECTION 1: TAKING MATERIAL
+# Anti-antichess
+# Total points of materials captured.
 ###############################################################################
 - id: badge_material_total
   type: badge
-  category: Material
+  category: Veterancy
   subcategory: 
-  name: The Hoarder
-  description: Total points of materials captured (including trades).
+  name: 'Anti-antichess'
+  description: 'Total points of materials captured.'
+  badge-flavor-text: '*You know this is not the point, right?*'
   config:
     tiers:
-      bronze: 500
-      silver: 2500
-      gold: 10000
-      platinum: 50000
+      pawn:
+        amount:              500     #
+        tier-flavor-text: '**'
+      knight:
+        amount:               19     #
+        tier-flavor-text: '**'
+      bishop:
+        amount:               83     #
+        tier-flavor-text: '**'
+      rook:
+        amount:              131     #
+        tier-flavor-text: '**'
+      queen:
+        amount:              829     #
+        tier-flavor-text: '**'
+      king:
+        amount:             1367     #
+        tier-flavor-text: '**'
+      immortal:
+        amount:             2969     #
+        tier-flavor-text: '**'
+      legend:
+        amount:             5000     #
+        tier-flavor-text: '**'
+
+
+
+###############################################################################
+#
+#
+###############################################################################
 - id: badge_en_passant
   type: badge
-  category: Geometry
-  name: En passant is forced
-  description: Execute an en passant capture.
+  category:
+  subcategory
+  name:
+  description: 'Total number of en passants.'
+  badge-flavor-text: '*En passant is forced.*'
   config:
-    tiers: { bronze: 1, silver: 10, gold: 50 }
+    tiers:
+      pawn:
+        amount:              500     #
+        tier-flavor-text: '**'
+      knight:
+        amount:               19     #
+        tier-flavor-text: '**'
+      bishop:
+        amount:               83     #
+        tier-flavor-text: '**'
+      rook:
+        amount:              131     #
+        tier-flavor-text: '**'
+      queen:
+        amount:              829     #
+        tier-flavor-text: '**'
+      king:
+        amount:             1367     #
+        tier-flavor-text: '**'
+      immortal:
+        amount:             2969     #
+        tier-flavor-text: '**'
+      legend:
+        amount:             5000     #
+        tier-flavor-text: '**'
 ---
 
 ###############################################################################
@@ -37,3 +92,33 @@
       bronze: 10
       silver: 50
       gold: 250
+
+- id: badge_opposite_side_casteling
+  type: badge
+  category: Skill
+  subcategory:
+  name:
+  description: 'Games won in games where opposite side castling'
+  badge-flavor-text: '**'
+
+
+
+
+- id: badge_total_checks
+  type: badge
+  category: Skill
+  subcategory:
+  name:
+  description: ''
+  badge-flavor-text: '**'
+
+
+
+
+- id: badge_fianchetto_total
+  type: badge
+  category: Skill
+  subcategory:
+  name:
+  description: ''
+  badge-flavor-text: '**'
